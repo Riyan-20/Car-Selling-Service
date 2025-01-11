@@ -1,36 +1,20 @@
-import React from "react";
-import {
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Box,
-} from "@mui/material";
+import React from 'react';
+import { Card, CardContent, Typography, Button } from '@mui/material';
 
-const SubmissionCard = ({ submission }) => {
+const SubmissionCard = ({ car }) => {
   return (
-    <Card>
-      <CardMedia
-        component="img"
-        height="200"
-        image={submission.images[0] || "https://via.placeholder.com/200"}
-        alt={submission.carModel}
-      />
+    <Card sx={{ maxWidth: 345, marginBottom: 2 }}>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {submission.carModel}
-        </Typography>
-        <Box display="flex" justifyContent="space-between" marginBottom={1}>
-          <Typography>Price:</Typography>
-          <Typography>{submission.price} PKR</Typography>
-        </Box>
-        <Box display="flex" justifyContent="space-between" marginBottom={1}>
-          <Typography>Phone:</Typography>
-          <Typography>{submission.phoneNumber}</Typography>
-        </Box>
+        <Typography variant="h5">{car.model}</Typography>
         <Typography variant="body2" color="textSecondary">
-          Submitted by: {submission.userEmail}
+          Price: ${car.price}
         </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Phone: {car.phoneNumber}
+        </Typography>
+        <Button size="small" color="primary">
+          View Details
+        </Button>
       </CardContent>
     </Card>
   );

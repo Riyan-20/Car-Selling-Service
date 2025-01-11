@@ -1,57 +1,48 @@
-import React from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useAuth } from "../context/AuthContext";
+import React, { useState } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { loginUser } from '../utils/api';
 
 const LoginForm = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const formik = useFormik({
-    initialValues: { email: "", password: "" },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email format").required("Required"),
-      password: Yup.string().required("Required"),
-    }),
-    onSubmit: async (values) => {
-      try {
-        await login(values.email, values.password);
-      } catch (error) {
-        alert("Login failed: " + error.message);
-      }
-    },
-  });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await loginUser(email, password);
+      login(response.data.token);
+      navigate('/car-submission');
+    } catch (err) {
+      setError('Invalid credentials');
+    }
+  };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="100vh"
-    >
-      <Typography variant="h4" marginBottom={2}>
+    <Box sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
+      <Typography variant="h4" gutterBottom>
         Login
       </Typography>
-      <form onSubmit={formik.handleSubmit}>
+      {error && <Typography color="error">{error}</Typography>}
+      <form onSubmit={handleLogin}>
         <TextField
-          fullWidth
           label="Email"
-          variant="outlined"
+          fullWidth
           margin="normal"
-          {...formik.getFieldProps("email")}
-          error={formik.touched.email && !!formik.errors.email}
-          helperText={formik.touched.email && formik.errors.email}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
-          fullWidth
           label="Password"
           type="password"
-          variant="outlined"
+          fullWidth
           margin="normal"
-          {...formik.getFieldProps("password")}
-          error={formik.touched.password && !!formik.errors.password}
-          helperText={formik.touched.password && formik.errors.password}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Login

@@ -1,101 +1,69 @@
-import React, { useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import Dropzone from "react-dropzone";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import React, { useState } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { submitCar } from '../utils/api';
 
-const CarSubmissionForm = ({ onSubmit }) => {
-  const [images, setImages] = useState([]);
+const CarSubmissionForm = () => {
+  const [model, setModel] = useState('');
+  const [price, setPrice] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [maxPictures, setMaxPictures] = useState('');
+  const [pictures, setPictures] = useState([]);
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
-  const formik = useFormik({
-    initialValues: { carModel: "", price: "", phoneNumber: "", maxPictures: 1 },
-    validationSchema: Yup.object({
-      carModel: Yup.string().min(3).required("Required"),
-      price: Yup.number().required("Required"),
-      phoneNumber: Yup.string()
-        .matches(/^\d{11}$/, "Must be exactly 11 digits")
-        .required("Required"),
-      maxPictures: Yup.number()
-        .min(1)
-        .max(10)
-        .required("Required"),
-    }),
-    onSubmit: (values) => {
-      onSubmit({ ...values, images });
-    },
-  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await submitCar({ model, price, phoneNumber, maxPictures, pictures }, token);
+      navigate('/view-submissions');
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <TextField
-        fullWidth
-        label="Car Model"
-        variant="outlined"
-        margin="normal"
-        {...formik.getFieldProps("carModel")}
-        error={formik.touched.carModel && !!formik.errors.carModel}
-        helperText={formik.touched.carModel && formik.errors.carModel}
-      />
-      <TextField
-        fullWidth
-        label="Price"
-        variant="outlined"
-        margin="normal"
-        {...formik.getFieldProps("price")}
-        error={formik.touched.price && !!formik.errors.price}
-        helperText={formik.touched.price && formik.errors.price}
-      />
-      <TextField
-        fullWidth
-        label="Phone Number"
-        variant="outlined"
-        margin="normal"
-        {...formik.getFieldProps("phoneNumber")}
-        error={formik.touched.phoneNumber && !!formik.errors.phoneNumber}
-        helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-      />
-      <TextField
-        fullWidth
-        label="Max Number of Pictures"
-        variant="outlined"
-        margin="normal"
-        {...formik.getFieldProps("maxPictures")}
-        error={formik.touched.maxPictures && !!formik.errors.maxPictures}
-        helperText={formik.touched.maxPictures && formik.errors.maxPictures}
-      />
-      <Dropzone
-        onDrop={(acceptedFiles) => {
-          setImages(acceptedFiles.slice(0, formik.values.maxPictures));
-        }}
-      >
-        {({ getRootProps, getInputProps }) => (
-          <Box
-            {...getRootProps()}
-            border="1px dashed gray"
-            padding={2}
-            textAlign="center"
-            marginTop={2}
-          >
-            <input {...getInputProps()} />
-            <Typography>Drag and drop images here, or click to upload</Typography>
-          </Box>
-        )}
-      </Dropzone>
-      <Box marginTop={2}>
-        {images.map((file, index) => (
-          <img
-            key={index}
-            src={URL.createObjectURL(file)}
-            alt={`preview-${index}`}
-            width={100}
-            style={{ marginRight: 8 }}
-          />
-        ))}
-      </Box>
-      <Button type="submit" variant="contained" color="primary" fullWidth>
-        Submit
-      </Button>
-    </form>
+    <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Car Submission
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Car Model"
+          fullWidth
+          margin="normal"
+          value={model}
+          onChange={(e) => setModel(e.target.value)}
+        />
+        <TextField
+          label="Price"
+          type="number"
+          fullWidth
+          margin="normal"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <TextField
+          label="Phone Number"
+          fullWidth
+          margin="normal"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+        <TextField
+          label="Max Pictures"
+          type="number"
+          fullWidth
+          margin="normal"
+          value={maxPictures}
+          onChange={(e) => setMaxPictures(e.target.value)}
+        />
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Submit
+        </Button>
+      </form>
+    </Box>
   );
 };
 

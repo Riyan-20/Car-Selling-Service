@@ -1,12 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cors = require('cors'); // Import the CORS package
 const authRoutes = require('./routes/authRoutes');
 const carRoutes = require('./routes/carRoutes');
 
 dotenv.config();
 
 const app = express();
+
+// Enable CORS for all origins (you can restrict this later if needed)
+app.use(cors()); // This enables CORS for all domains
 
 // Middleware to parse JSON requests
 app.use(express.json());
