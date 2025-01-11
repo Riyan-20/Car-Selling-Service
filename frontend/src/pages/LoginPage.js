@@ -13,7 +13,7 @@ const LoginPage = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post("/api/login", values);
+        const response = await axios.post("/api/auth/login", values);
         if (response.data.success) {
           // Navigate to car submission page
           localStorage.setItem("token", response.data.token);
